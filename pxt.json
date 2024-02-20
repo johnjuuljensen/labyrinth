@@ -16,9 +16,7 @@
         "images.g.ts",
         "maze.ts"
     ],
-    "testFiles": [
-        "test.ts"
-    ],
+    "testFiles": [],
     "targetVersions": {
         "target": "1.12.47",
         "targetId": "arcade"
