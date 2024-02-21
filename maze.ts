@@ -1,10 +1,10 @@
-//% weight=100 color=#0fbc11 icon=""
 enum MazeAlgorithm {
     BinaryTree = 0,
     Sidewinder = 1,
     Ellers = 2
 }
 
+//% weight=100 color=#0fbc11 icon=""
 namespace maze {
 
     /**
