@@ -1,4 +1,4 @@
-tiles.setCurrentTilemap(maze.generateTilemap(MazeAlgorithm.Sidewinder, 16, 16, sprites.dungeon.floorDark0, sprites.castle.tileGrass2))
+tiles.setCurrentTilemap(maze.generateTilemap(MazeAlgorithm.Ellers, 8, 8, sprites.dungeon.floorDark0, sprites.castle.tileGrass2))
 let mySprite = sprites.create(img`
     ........................
     .....ffff...............
@@ -28,6 +28,3 @@ let mySprite = sprites.create(img`
 tiles.placeOnTile(mySprite, tiles.getTileLocation(2, 2))
 controller.moveSprite(mySprite)
 scene.cameraFollowSprite(mySprite)
-for (let index = 0; index < 50; index++) {
-    tiles.setTileAt(tiles.getTilesByType(sprites.castle.tileGrass2)._pickRandom(), sprites.dungeon.chestClosed)
-}

@@ -1,7 +1,8 @@
 //% weight=100 color=#0fbc11 icon=""
 enum MazeAlgorithm {
     BinaryTree = 0,
-    Sidewinder = 1
+    Sidewinder = 1,
+    Ellers = 2
 }
 
 namespace maze {
@@ -20,10 +21,9 @@ namespace maze {
     //% corridorSize.defl=2
     //% inlineInputMode=inline
     export function generateTilemap(algorithm: MazeAlgorithm, mazeWidth: number, mazeHeight: number, wall: Image, floor: Image, corridorSize?: number): tiles.TileMapData {
-        corridorSize = corridorSize || 2;
-        return algorithm === MazeAlgorithm.BinaryTree ?
-            generateBinaryTreeTilemap(mazeWidth, mazeHeight, wall, floor, corridorSize) :
-            generateSidewinderTilemap(mazeWidth, mazeHeight, wall, floor, corridorSize);
+        return algorithm === MazeAlgorithm.BinaryTree ? generateBinaryTreeTilemap(mazeWidth, mazeHeight, wall, floor, corridorSize || 2) :
+            algorithm === MazeAlgorithm.Sidewinder ? generateSidewinderTilemap(mazeWidth, mazeHeight, wall, floor, corridorSize || 2) :
+            generateEllersTilemap(mazeWidth, mazeHeight, wall, floor, corridorSize || 2);
     }
 
     function createTilemap(mazeWidth: number, mazeHeight: number, corridorSize: number, tmTiles: Image[]): tiles.TileMapData {
@@ -41,8 +41,14 @@ namespace maze {
         for (let y = 0; y < tmData.height; ++y)
             for (let x = 0; x < tmData.width; ++x) {
                 tmData.setTile(x, y, 1);
-                tmData.setWall(x, y, true);
+                //tmData.setWall(x, y, true);
             }
+    }
+
+    function range(min: number, max: number): number[] { 
+        const arr = [];
+        for(let i = min; i <= max; ++i) arr.push(i);
+        return arr 
     }
 
     function generateBinaryTreeTilemap(mazeWidth: number, mazeHeight: number, wall: Image, floor: Image, corridorSize: number): tiles.TileMapData {
@@ -120,6 +126,74 @@ namespace maze {
                     start = end = x+1;
                 }
             }
+        }
+        return tmData;
+    }
+
+    function generateEllersTilemap(mazeWidth: number, mazeHeight: number, wall: Image, floor: Image, corridorSize: number): tiles.TileMapData {
+        // https://weblog.jamisbuck.org/2010/12/29/maze-generation-eller-s-algorithm#
+        let tmData = createTilemap(mazeWidth, mazeHeight, corridorSize, [floor, wall]);
+        fillWalls(tmData);
+
+        let yMax = mazeHeight - 1;
+        let xMax = mazeWidth - 1;
+        let currentRow = range(0, xMax);
+        for (let y = 0; y < mazeHeight; ++y) {
+
+            let ty = y * (corridorSize + 1) + 1;
+            for (let x = 0; x < mazeWidth; x++) {
+                let tx = x * (corridorSize + 1) + 1;
+                
+                const shouldMergeRight = x < xMax && currentRow[x] !== currentRow[x+1] && (y == yMax || Math.randomRange(0, 1));
+
+                if (shouldMergeRight ) {
+                    const setToAbsorb = currentRow[x + 1];
+                    for (let i = 0; i <= xMax; ++i) 
+                        if (currentRow[i] === setToAbsorb)
+                            currentRow[i] = currentRow[x];
+                }
+
+                for (let by = 0; by < corridorSize; ++by)
+                    for (let bx = 0; bx < corridorSize + (shouldMergeRight?1:0); ++bx) {
+                        tmData.setTile(tx + bx, ty + by, 0);
+                        tmData.setWall(tx + bx, ty + by, false);
+                    }
+            }
+
+            if (y == yMax) break;
+            ty+=corridorSize;
+            const nextRow = range((y + 1) * xMax + 1, (y + 2) * xMax + 1);
+
+            const sets = currentRow.map((v,i) => [v,i]).reduce((acc, a) => {
+                const [v,i] = a;
+                const s = `${v}`;
+                acc[s] = (acc[s] || []);
+                acc[s].push(i);
+                return acc;
+            }, <{[key: string]: number[]}>{})
+
+            for (const s of Object.keys(sets)) {
+                let xs = sets[s];
+                for (let i = xs.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * i);
+                    const k = xs[i];
+                    xs[i] = xs[j];
+                    xs[j] = k;
+                }
+
+                xs = xs.slice(0, Math.randomRange(1,xs.length));
+
+                for (const x of xs) {
+                    let tx = x * (corridorSize + 1) + 1;
+                    for (let bx = 0; bx < corridorSize; ++bx) {
+                        tmData.setTile(tx + bx, ty, 0);
+                        tmData.setWall(tx + bx, ty, false);
+                    }
+                    nextRow[x] = currentRow[x];
+                }
+            }
+
+            currentRow = nextRow;
         }
         return tmData;
     }
