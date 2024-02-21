@@ -6,17 +6,18 @@
         "device": "*"
     },
     "files": [
+        "README.md",
+        "maze.ts"
+    ],
+    "testFiles": [
         "main.blocks",
         "main.ts",
-        "README.md",
         "assets.json",
         "tilemap.g.jres",
         "tilemap.g.ts",
         "images.g.jres",
-        "images.g.ts",
-        "maze.ts"
+        "images.g.ts"
     ],
-    "testFiles": [],
     "targetVersions": {
         "target": "1.12.47",
         "targetId": "arcade"
