@@ -41,7 +41,7 @@ namespace maze {
         for (let y = 0; y < tmData.height; ++y)
             for (let x = 0; x < tmData.width; ++x) {
                 tmData.setTile(x, y, 1);
-                //tmData.setWall(x, y, true);
+                tmData.setWall(x, y, true);
             }
     }
 
