@@ -1,5 +1,16 @@
- 
+This extension creates mazes as tilemaps. Three different maze algorithms, as described by https://weblog.jamisbuck.org,
+have been implemented: Binary Tree, Sidewinder & Ellers.
 
+The extension adds a new block which returns a tilemap. 
+
+Dimensions, wall/floor tiles and, optionally, corridor size can be configured.
+
+For the tile selectors to work properly you hould create a tilemap asset, using at least the tile you want to use for 
+walls and floors. The asset tilemap serves no other purpose.
+
+## Blocks preview
+
+![A rendered view of the blocks](https://github.com/johnjuuljensen/makecode_maze/raw/master/.github/makecode/blocks.png)
 
 > Open this page at [https://johnjuuljensen.github.io/makecode_maze/](https://johnjuuljensen.github.io/makecode_maze/)
 
@@ -20,12 +31,6 @@ To edit this repository in MakeCode.
 * click on **Import** then click on **Import URL**
 * paste **https://github.com/johnjuuljensen/makecode_maze** and click import
 
-## Blocks preview
-
-This image shows the blocks code from the last commit in master.
-This image may take a few minutes to refresh.
-
-![A rendered view of the blocks](https://github.com/johnjuuljensen/makecode_maze/raw/master/.github/makecode/blocks.png)
 
 #### Metadata (used for search, rendering)
 

@@ -4,7 +4,7 @@ enum MazeAlgorithm {
     Ellers = 2
 }
 
-//% weight=100 color=#0fbc11 icon=""
+//% weight=100 color=#0fbc11 icon="╬"
 namespace maze {
 
     /**
