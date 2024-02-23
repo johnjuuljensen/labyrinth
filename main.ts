@@ -28,6 +28,6 @@ let mySprite = sprites.create(img`
 tiles.placeOnTile(mySprite, tiles.getTileLocation(2, 2))
 controller.moveSprite(mySprite)
 scene.cameraFollowSprite(mySprite)
-for (let value of getRandomTilesByType(sprites.castle.tileGrass2, 10)) {
+for (let value of tilesExt.getRandomTilesByType(sprites.castle.tileGrass2, 10)) {
     tiles.setTileAt(value, sprites.dungeon.chestClosed)
 }

@@ -14,6 +14,7 @@ namespace maze {
      * @param floor tile to use for floors
      * @param corridorSize width of corridors
      */
+    //% blickId=maze_generateTilemap
     //% block="Create $algorithm maze tilemap, width $mazeWidth height $mazeHeight wall $wall floor $floor || corridorSize $corridorSize seed $seed"
     //% wall.shadow=tileset_tile_picker
     //% floor.shadow=tileset_tile_picker
