@@ -6,7 +6,6 @@ enum MazeAlgorithm {
 
 //% weight=100 color=#0fbc11 icon="╬"
 namespace maze {
-
     /**
      * Generates a maze using the chosen algorithm
      * @param mazeWidth width of maze
@@ -15,15 +14,16 @@ namespace maze {
      * @param floor tile to use for floors
      * @param corridorSize width of corridors
      */
-    //% block="Create $algorithm maze tilemap, width $mazeWidth height $mazeHeight wall $wall floor $floor || corridorSize $corridorSize"
+    //% block="Create $algorithm maze tilemap, width $mazeWidth height $mazeHeight wall $wall floor $floor || corridorSize $corridorSize seed $seed"
     //% wall.shadow=tileset_tile_picker
     //% floor.shadow=tileset_tile_picker
     //% corridorSize.defl=2
     //% inlineInputMode=inline
-    export function generateTilemap(algorithm: MazeAlgorithm, mazeWidth: number, mazeHeight: number, wall: Image, floor: Image, corridorSize?: number): tiles.TileMapData {
-        return algorithm === MazeAlgorithm.BinaryTree ? generateBinaryTreeTilemap(mazeWidth, mazeHeight, wall, floor, corridorSize || 2) :
-            algorithm === MazeAlgorithm.Sidewinder ? generateSidewinderTilemap(mazeWidth, mazeHeight, wall, floor, corridorSize || 2) :
-            generateEllersTilemap(mazeWidth, mazeHeight, wall, floor, corridorSize || 2);
+    export function generateTilemap(algorithm: MazeAlgorithm, mazeWidth: number, mazeHeight: number, wall: Image, floor: Image, corridorSize?: number, seed?:number|undefined): tiles.TileMapData {
+        const rng = new Math.FastRandom(seed);
+        return algorithm === MazeAlgorithm.BinaryTree ? generateBinaryTreeTilemap(rng, mazeWidth, mazeHeight, wall, floor, corridorSize || 2) :
+            algorithm === MazeAlgorithm.Sidewinder ? generateSidewinderTilemap(rng, mazeWidth, mazeHeight, wall, floor, corridorSize || 2) :
+                generateEllersTilemap(rng, mazeWidth, mazeHeight, wall, floor, corridorSize || 2);
     }
 
     function createTilemap(mazeWidth: number, mazeHeight: number, corridorSize: number, tmTiles: Image[]): tiles.TileMapData {
@@ -51,7 +51,7 @@ namespace maze {
         return arr 
     }
 
-    function generateBinaryTreeTilemap(mazeWidth: number, mazeHeight: number, wall: Image, floor: Image, corridorSize: number): tiles.TileMapData {
+    function generateBinaryTreeTilemap(rng: Math.FastRandom, mazeWidth: number, mazeHeight: number, wall: Image, floor: Image, corridorSize: number): tiles.TileMapData {
         let tmData = createTilemap(mazeWidth,mazeHeight,corridorSize,[floor,wall]);
         fillWalls(tmData);
 
@@ -69,7 +69,7 @@ namespace maze {
                     // If right edge, carve down
                     x === xMax ? [0,1] :
                     // Pick random
-                    Math.randomRange(0,1) ? [1,0]: [0,1];
+                    rng.randomBool() ? [1,0]: [0,1];
                 // Set floor
                 for (let by = 0; by < corridorSize + cy; ++by)
                     for (let bx = 0; bx < corridorSize + cx; ++bx) {
@@ -81,7 +81,7 @@ namespace maze {
         return tmData;
     }
 
-    function generateSidewinderTilemap(mazeWidth: number, mazeHeight: number, wall: Image, floor: Image, corridorSize: number): tiles.TileMapData {
+    function generateSidewinderTilemap(rng: Math.FastRandom, mazeWidth: number, mazeHeight: number, wall: Image, floor: Image, corridorSize: number): tiles.TileMapData {
         // https://weblog.jamisbuck.org/2011/2/3/maze-generation-sidewinder-algorithm.html
         let tmData = createTilemap(mazeWidth, mazeHeight, corridorSize, [floor, wall]);
         fillWalls(tmData);
@@ -106,7 +106,7 @@ namespace maze {
                     // If right edge, carve down
                     x === xMax ? [0,1] :
                     // Pick random
-                    Math.randomRange(0,1) ? [1,0]: [0,1];
+                    rng.randomBool() ? [1,0]: [0,1];
                 
                 if(cx === 1) {
                     tx += corridorSize;
@@ -118,7 +118,7 @@ namespace maze {
                 } 
                 if(cy === 1){
                     ty += corridorSize;
-                    tx = Math.randomRange(start,end) * (corridorSize + 1) + 1;
+                    tx = rng.randomRange(start,end) * (corridorSize + 1) + 1;
                     for (let i = 0; i < corridorSize; ++i) {
                         tmData.setTile(tx+i, ty, 0);
                         tmData.setWall(tx+i, ty, false);
@@ -130,7 +130,7 @@ namespace maze {
         return tmData;
     }
 
-    function generateEllersTilemap(mazeWidth: number, mazeHeight: number, wall: Image, floor: Image, corridorSize: number): tiles.TileMapData {
+    function generateEllersTilemap(rng: Math.FastRandom, mazeWidth: number, mazeHeight: number, wall: Image, floor: Image, corridorSize: number): tiles.TileMapData {
         // https://weblog.jamisbuck.org/2010/12/29/maze-generation-eller-s-algorithm#
         let tmData = createTilemap(mazeWidth, mazeHeight, corridorSize, [floor, wall]);
         fillWalls(tmData);
@@ -144,7 +144,7 @@ namespace maze {
             for (let x = 0; x < mazeWidth; x++) {
                 let tx = x * (corridorSize + 1) + 1;
                 
-                const shouldMergeRight = x < xMax && currentRow[x] !== currentRow[x+1] && (y == yMax || Math.randomRange(0, 1));
+                const shouldMergeRight = x < xMax && currentRow[x] !== currentRow[x+1] && (y == yMax || rng.randomBool());
 
                 if (shouldMergeRight ) {
                     const setToAbsorb = currentRow[x + 1];
@@ -175,13 +175,13 @@ namespace maze {
             for (const s of Object.keys(sets)) {
                 let xs = sets[s];
                 for (let i = xs.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * i);
+                    const j = Math.floor(rng.randomRange(0,i));
                     const k = xs[i];
                     xs[i] = xs[j];
                     xs[j] = k;
                 }
 
-                xs = xs.slice(0, Math.randomRange(1,xs.length));
+                xs = xs.slice(0, rng.randomRange(1,xs.length));
 
                 for (const x of xs) {
                     let tx = x * (corridorSize + 1) + 1;
