@@ -15,6 +15,7 @@ namespace maze {
      * @param corridorSize width of corridors
      * @param seed initialize the random number generator
      */
+    //% blickId=maze_generateTilemap
     //% block="Create $algorithm maze tilemap, width $mazeWidth height $mazeHeight wall $wall floor $floor || corridorSize $corridorSize seed $seed"
     //% wall.shadow=tileset_tile_picker
     //% floor.shadow=tileset_tile_picker
