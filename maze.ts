@@ -13,6 +13,7 @@ namespace maze {
      * @param wall tile to use for walls
      * @param floor tile to use for floors
      * @param corridorSize width of corridors
+     * @param seed initialize the random number generator
      */
     //% block="Create $algorithm maze tilemap, width $mazeWidth height $mazeHeight wall $wall floor $floor || corridorSize $corridorSize seed $seed"
     //% wall.shadow=tileset_tile_picker
