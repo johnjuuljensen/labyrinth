@@ -6,6 +6,8 @@
         "device": "*"
     },
     "files": [
+        "tilemap.g.jres",
+        "tilemap.g.ts",
         "README.md",
         "maze.ts",
         "tilemapExt.ts"
