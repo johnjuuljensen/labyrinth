@@ -24,26 +24,18 @@ let mySprite = sprites.create(img`
     ........................
     ........................
     ........................
-    `, SpriteKind.Player);
-tiles.placeOnTile(mySprite, tiles.getTileLocation(2, 2));
-controller.moveSprite(mySprite);
-scene.cameraFollowSprite(mySprite);
+    `, SpriteKind.Player)
+tiles.placeOnTile(mySprite, tiles.getTileLocation(2, 2))
+controller.moveSprite(mySprite)
+scene.cameraFollowSprite(mySprite)
 for (let value of tilesExt.getRandomTilesByType(sprites.castle.tileGrass2, 10)) {
     tiles.setTileAt(value, sprites.dungeon.chestClosed)
 }
-//tilesExt.setTileBetweenLocations(new tiles.Location(0,0,undefined), new tiles.Location(5,6,undefined), sprites.builtin.brick);
-
-// tilesExt.line(
-//     LineType.Diagonal, 
-//     new tiles.Location(0,0,undefined), 
-//     new tiles.Location(7,5,undefined), 
-//     true, 
-//     (x,y) => tiles.setTileAt(new tiles.Location(x,y,undefined), sprites.builtin.brick));
-
-// tilesExt.line(
-//     LineType.Diagonal, 
-//     new tiles.Location(0,1,undefined), 
-//     new tiles.Location(7,6,undefined), 
-//     true, 
-//     (x,y) => tiles.setTileAt(new tiles.Location(x,y,undefined), sprites.builtin.brick));
-game.debug = true;
+tilesExt._line(LineType.Diagonal, tiles.getTileLocation(0, 0), tiles.getTileLocation(5, 5), true, function (loc) {
+    tiles.setTileAt(loc, sprites.builtin.brick)
+})
+forever(function () {
+    if (true) {
+    	
+    }
+})
