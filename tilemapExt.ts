@@ -21,7 +21,7 @@ namespace tilesExt {
     //% inlineInputMode=inline
     //% l1.shadow=mapgettile
     //% l2.shadow=mapgettile
-    export function line(lineType: LineType, l1: TL, l2: TL, exclusive: boolean): TL[] {
+    export function line(lineType: LineType, l1: TL, l2: TL, exclusive?: boolean): TL[] {
         return lineType === LineType.Diagonal ? diagonalLine(l1,l2,exclusive) :
             lineType === LineType.Covering ? coveringLine(l1,l2,exclusive) :
             undefined;

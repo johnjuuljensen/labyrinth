@@ -31,3 +31,6 @@ scene.cameraFollowSprite(mySprite)
 for (let value of tilesExt.getRandomTilesByType(sprites.castle.tileGrass2, 10)) {
     tiles.setTileAt(value, sprites.dungeon.chestClosed)
 }
+for (let value of tilesExt.line(LineType.Covering, tiles.getTileLocation(0, 0), tiles.getTileLocation(5, 5))) {
+    tiles.setTileAt(value, sprites.builtin.brick)
+}
