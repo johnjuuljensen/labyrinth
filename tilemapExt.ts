@@ -8,83 +8,54 @@ namespace tilesExt {
     import TL = tiles.Location;
 
     /**
-     * Iterates over a line between two locations. If the handler returns truthy, then the iteration is stopped,
-     * and the handlers return value is returned, otherwise the iteration runs to completion and returns undefined.
+     * Calculates the locations between two given locations.
      * @param lineType width of maze
      * @param l1 start
      * @param l2 end
-     * @param handler a handler which is invoked for each location
      * @param exclusive exclude the endpoints
-     * @returns undefined if the whole line was iterated
+     * @returns The locations intersected by the line
      */
     //% blickId="tilesExt_line"
-    //% block="for each $loc on $lineType line from $l1 to $l2 exclusive $exclusive"
+    //% block="array of locations on $lineType line from $l1 to $l2 || exclusive $exclusive"
     //% exclusive.defl=false
     //% inlineInputMode=inline
     //% l1.shadow=mapgettile
     //% l2.shadow=mapgettile
-    //% loc.shadow=loc
-    //% draggableParameters="reporter"
-    export function line<T>(lineType: LineType, l1: TL, l2: TL, exclusive: boolean, handler: (loc: TL) => T): T {
-        return lineType === LineType.Diagonal ? diagonalLine(l1,l2,exclusive,handler) :
-            lineType === LineType.Covering ? coveringLine(l1,l2,exclusive,handler) :
+    export function line(lineType: LineType, l1: TL, l2: TL, exclusive: boolean): TL[] {
+        return lineType === LineType.Diagonal ? diagonalLine(l1,l2,exclusive) :
+            lineType === LineType.Covering ? coveringLine(l1,l2,exclusive) :
             undefined;
     }
 
-    /**
-     * Iterates over a line between two locations. If the handler returns truthy, then the iteration is stopped,
-     * and the handlers return value is returned, otherwise the iteration runs to completion and returns undefined.
-     * @param lineType width of maze
-     * @param l1 start
-     * @param l2 end
-     * @param handler a handler which is invoked for each location
-     * @param exclusive exclude the endpoints
-     * @returns undefined if the whole line was iterated
-     */
-    //% block="for each $loc on $lineType line from $l1 to $l2 exclusive $exclusive"
-    //% blockId="tilesExt_line_statement"
-    //% blockAliasFor="tilesExt.line"
-    //% exclusive.defl=false
-    //% inlineInputMode=inline
-    //% l1.shadow=mapgettile
-    //% l2.shadow=mapgettile
-    //% draggableParameters="reporter"
-    //% topblock=false
-    //% handlerStatement=true
-    export function _line(lineType: LineType, l1: TL, l2: TL, exclusive: boolean, handler: (loc: TL) => boolean | void): void {
-        line(lineType, l1, l2, exclusive, handler);
-    }
 
     function lerp(start: number, end: number, t: number) {
         return start * (1.0 - t) + t * end;
     }
 
-    function diagonalLine<T>(l1: TL, l2: TL, exclusive: boolean, handler: (loc: TL) => T): T {
+    function diagonalLine(l1: TL, l2: TL, exclusive: boolean): TL[] {
         const dx = l2.col-l1.col, dy = l2.row-l1.row;
         const N = Math.max(Math.abs(dx), Math.abs(dy));
         if (N <= 0) {
-            return exclusive ? undefined : handler(l1);
-        } else {
-            const lastN = N  - (exclusive ? 1 : 0);
-            for (let step = (exclusive ? 1 : 0); step <= lastN; step++) {
-                let t = step / N;
-                const res = handler(
-                    new TL(
-                        Math.round(lerp(l1.col, l2.col, t)),
-                        Math.round(lerp(l1.row, l2.row, t)),
-                        l1.tileMap
-                    ));
-                if (res) return res;
-            }
+            return exclusive ? [] : [l1];
         }
 
-        return undefined;
+        const res = [];
+        const lastN = N  - (exclusive ? 1 : 0);
+        for (let step = (exclusive ? 1 : 0); step <= lastN; step++) {
+            let t = step / N;
+            res.push(
+                new TL(
+                    Math.round(lerp(l1.col, l2.col, t)),
+                    Math.round(lerp(l1.row, l2.row, t)),
+                    l1.tileMap
+                ));
+        }
+
+        return res;
     }
   
-  
-    
 
-    export function coveringLine<T>(l1: TL, l2: TL, exclusive: boolean, handler: (loc: TL) => T): T {
+    export function coveringLine(l1: TL, l2: TL, exclusive: boolean): TL[] {
         // https://www.redblobgames.com/grids/line-drawing/#stepping
         const dx = l2.col-l1.col, dy = l2.row-l1.row;
         const absx = Math.abs(dx), absy = Math.abs(dy);
@@ -102,8 +73,9 @@ namespace tilesExt {
             }
         }
 
+        const res = [];
         for (; ix < absx || iy < absy;) {
-            const res = handler(new TL(x, y, l1.tileMap));
+            res.push(new TL(x, y, l1.tileMap));
             if (res) return res;
             if ((1+ix<<1)*absy < (1+iy<<1)*absx) {
                 x += stepx;
@@ -114,23 +86,10 @@ namespace tilesExt {
             }
         }
         if (!exclusive) {
-            const res = handler(new TL(x, y, l1.tileMap));
-            if (res) return res;
+            res.push(new TL(x, y, l1.tileMap));
         }
 
-        return undefined;
-    }
-
-    export function isWallBetweenLocations(l1: TL, l2: TL, tileMap?: tiles.TileMap): TL | void {
-        tileMap = tileMap || game.currentScene().tileMap;
-        return coveringLine(l1, l2, true, loc => tileMap.isObstacle(loc.col, loc.row) ? loc : undefined);
-    }
-
-
-    export function setTileBetweenLocations(l1: TL, l2: TL, im: Image, tileMap?: tiles.TileMap): void {
-        tileMap = tileMap || game.currentScene().tileMap;
-        const index = tileMap.getImageType(im);
-        coveringLine(l1, l2, false, loc => tileMap.setTileAt(loc.col, loc.row, index));
+        return res;
     }
 
 
